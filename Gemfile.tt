@@ -27,6 +27,7 @@ gem 'friendly_id'
 group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
+  gem 'rspec-rails', '~> 3.8'
 end
 
 group :development do
@@ -45,7 +46,7 @@ group :development do
   gem 'overcommit'
   gem 'rubocop', require: false
 
-  gem 'guard'
+  gem 'guard', '~> 2.15'
   gem 'guard-bundler', require: false
   gem 'guard-livereload', require: false
   gem 'rack-livereload'

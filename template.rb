@@ -1,8 +1,12 @@
-require "fileutils"
-require "shellwords"
-require "tmpdir"
+# frozen_string_literal: true
 
-RAILS_REQUIREMENT = ">= 5.2.0.rc1"
+# TODO: (dysnomian) add postmark
+
+require 'fileutils'
+require 'shellwords'
+require 'tmpdir'
+
+RAILS_REQUIREMENT = '>= 5.2.0.rc1'
 
 def apply_template!
   assert_minimum_rails_version
@@ -11,7 +15,7 @@ def apply_template!
   # temporary fix bootsnap bug
   # comment_lines 'config/boot.rb', /bootsnap/
 
-  template "Gemfile.tt", force: true
+  template 'Gemfile.tt', force: true
   template 'README.md.tt', force: true
   apply 'config/template.rb'
   apply 'app/template.rb'
@@ -56,33 +60,30 @@ end
 # invoked remotely via HTTP, that means the files are not present locally.
 # In that case, use `git clone` to download them to a local temporary dir.
 def add_template_repository_to_source_path
-  if __FILE__ =~ %r{\Ahttps?://}
-    source_paths.unshift(tempdir = Dir.mktmpdir("rails-template-"))
+  if __FILE__.match?(%r{\Ahttps?://})
+    source_paths.unshift(tempdir = Dir.mktmpdir('rails-template-'))
     at_exit { FileUtils.remove_entry(tempdir) }
-    git :clone => [
-      "--quiet",
-      "https://github.com/damienlethiec/modern-rails-template",
+    git clone: [
+      '--quiet',
+      'https://github.com/damienlethiec/modern-rails-template',
       tempdir
-    ].map(&:shellescape).join(" ")
+    ].map(&:shellescape).join(' ')
   else
     source_paths.unshift(File.dirname(__FILE__))
   end
 end
 
 def gemfile_requirement(name)
-  @original_gemfile ||= IO.read("Gemfile")
+  @original_gemfile ||= IO.read('Gemfile')
   req = @original_gemfile[/gem\s+['"]#{name}['"]\s*(,[><~= \t\d\.\w'"]*)?.*$/, 1]
-  req && req.gsub("'", %(")).strip.sub(/^,\s*"/, ', "')
+  req && req.tr("'", %(")).strip.sub(/^,\s*"/, ', "')
 end
-
-
 
 def ask_optional_options
   @devise = yes?('Do you want to implement authentication in your app with the Devise gem?')
   @pundit = yes?('Do you want to manage authorizations with Pundit?') if @devise
   @uuid = yes?('Do you want to use UUID for active record primary?')
   @haml = yes?('Do you want to use Haml instead of EBR?')
-  @komponent = yes?('Do you want to adopt a component based design for your front-end?')
   @tailwind = yes?('Do you want to use Tailwind as a CSS framework?')
   @github = yes?('Do you want to push your project to Github?')
 end
@@ -90,7 +91,6 @@ end
 def install_optional_gems
   add_devise if @devise
   add_pundit if @pundit
-  add_komponent if @komponent
   add_haml if @haml
 end
 
@@ -105,21 +105,13 @@ end
 
 def add_haml
   insert_into_file 'Gemfile', "gem 'haml'\n", after: /'friendly_id'\n/
-  insert_into_file 'Gemfile', "gem 'haml-rails', git: 'git://github.com/indirect/haml-rails.git'\n", after: /'friendly_id'\n/
+  insert_into_file 'Gemfile', "gem 'haml-rails', '~> 1.0'\n", after: /'friendly_id'\n/
 end
-
-def add_komponent
-  insert_into_file 'Gemfile', "gem 'komponent'\n", after: /'friendly_id'\n/
-end
-
-
 
 def setup_uuid
   copy_file 'db/migrate/20180208061510_enable_pg_crypto_extension.rb'
   insert_into_file 'config/initializers/generators.rb', "  g.orm :active_record, primary_key_type: :uuid\n", after: /assets: false\n/
 end
-
-
 
 def setup_front_end
   copy_file '.browserslistrc'
@@ -133,7 +125,10 @@ def setup_npm_packages
 end
 
 def add_linters
-  run 'yarn add eslint babel-eslint eslint-config-airbnb-base eslint-config-prettier eslint-import-resolver-webpack eslint-plugin-import eslint-plugin-prettier lint-staged prettier stylelint stylelint-config-standard --dev'
+  run "yarn add eslint babel-eslint eslint-config-airbnb-base " \
+      "eslint-config-prettier eslint-import-resolver-webpack " \
+      "eslint-plugin-import eslint-plugin-prettier lint-staged prettier " \
+      "stylelint stylelint-config-standard --dev"
   copy_file '.eslintrc'
   copy_file '.stylelintrc'
   run 'yarn add normalize.css'
@@ -148,14 +143,8 @@ def add_css_framework
   run './node_modules/.bin/tailwind init app/javascript/css/tailwind.js'
   copy_file 'app/javascript/css/application.css'
   append_to_file 'app/javascript/packs/application.js', "import '../css/application.css';\n"
-  if @komponent
-    append_to_file '.postcssrc.yml', "  tailwindcss: './frontend/css/tailwind.js'"
-  else
-    append_to_file '.postcssrc.yml', "  tailwindcss: './app/javascript/css/tailwind.js'"
-  end
+  append_to_file '.postcssrc.yml', "  tailwindcss: './app/javascript/css/tailwind.js'"
 end
-
-
 
 def setup_gems
   setup_friendly_id
@@ -166,7 +155,6 @@ def setup_gems
   setup_rubocop
   setup_brakeman
   setup_guard
-  setup_komponent if @komponent
   setup_devise if @devise
   setup_pundit if @pundit
   setup_haml if @haml
@@ -218,29 +206,6 @@ def setup_guard
   run 'guard init livereload bundler'
   append_to_file 'Procfile.dev', "guard: bundle exec guard\n"
   insert_into_file 'config/environments/development.rb', "  config.middleware.insert_after ActionDispatch::Static, Rack::LiveReload\n", before: /^end/
-  if @komponent
-    insert_into_file 'Guardfile', %q(  watch(%r{frontend/.+\.(#{rails_view_exts * '|'})$})) + "\n", after: /extensions.values.uniq\n/
-  end
-end
-
-def setup_komponent
-  install_komponent
-  add_basic_components
-end
-
-def install_komponent
-  run 'rails g komponent:install --stimulus'
-  insert_into_file 'config/initializers/generators.rb', "  g.komponent stimulus: true, locale: true\n", after: /assets: false\n/
-  FileUtils.rm_rf 'app/javascript'
-  insert_into_file 'app/controllers/application_controller.rb', "  prepend_view_path Rails.root.join('frontend')\n", after: /exception\n/
-end
-
-def add_basic_components
-  run 'rails g component flash'
-  insert_into_file 'app/views/layouts/application.html.erb', "    <%= component 'flash' %>\n", after: /<body>\n/
-  run 'rails g component button'
-  run 'rails g component card'
-  run 'rails g component form'
 end
 
 def setup_devise
@@ -290,8 +255,6 @@ end
 def setup_haml
   run 'HAML_RAILS_DELETE_ERB=true rake haml:erb2haml'
 end
-
-
 
 def setup_git
   git flow: 'init -d'

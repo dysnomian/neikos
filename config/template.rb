@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 copy_file 'config/initializers/generators.rb'
 copy_file 'config/initializers/i18n.rb'
 copy_file 'config/initializers/sidekiq.rb'

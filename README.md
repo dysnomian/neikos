@@ -1,10 +1,22 @@
-# Modern Rails Template
+# Neikos
+
+## TODO
+
+- update this README
+- docker compose instead of foreman
+- sass (+ bourbon?)
+- highvoltage
+- react https://github.com/adaam2/docker-rails-react-starter
+- typescript compilation https://dev.to/ohbarye/modern-rails-app-boilerplate-with-react--typescript--docker-compose-h47
+- rspec
+- update generated readme
+- figure out a deployment story
+- postmark for mailers
+- dotenv
+- circleci setup
+- simplecov
 
 ## Description
-
-This is the rails template I used for my Rails 5.2 projects as a freelance developer. Its goal is to allow to begin new rails application easily, with a modern and efficient configuration and with good set of defaults. The project is still very much a work in progress. So do not expect it to be 100% bug free. [Contributions][], ideas and help are really welcome.
-
-This project is inspired by the template developed by Matt Brictson. Have a look [here][] to compare both.
 
 ## Requirements
 
@@ -24,7 +36,7 @@ To make this the default Rails application template on your system, create a `~/
 --webpack
 -d postgresql
 -T
--m https://raw.githubusercontent.com/damienlethiec/modern-rails-template/master/template.rb
+-m https://raw.githubusercontent.com/dysnomian/neikos/master/template.rb
 ```
 
 ## Usage
@@ -37,7 +49,7 @@ rails new blog \
   --webpack \
   -d postgresql \
   -T \
-  -m https://raw.githubusercontent.com/damienlethiec/modern-rails-template/master/template.rb
+  -m https://raw.githubusercontent.com/dysnomian/neikos/master/template.rb
 ```
 
 _Remember that options must go after the name of the application._ The only database supported by this template is `postgresql`.
@@ -59,6 +71,8 @@ The template will perform the following steps:
 1. Commit everything to git
 
 ## What is included?
+
+**TODO: update this**
 
 Below is an extract of what this generator does. You can check all the features by following the code, especially in `template.rb` and in the `Gemfile`.
 
@@ -89,7 +103,6 @@ When you launch a new rails app with the template, a few questions will be asked
 * If you also need authorization, [pundit][] can be added and configured too.
 * You can choose to use [Haml][] instead of `erb`
 * You can decide to use [UUID][] as the primary key for Active Record
-* If you feel adventurous, you can choose to use the [komponent][] gem and build your front-end following the workflow describe in this great [article][]
 * You can include [tailwindcss][] in your project. The configure is inspired by the following Gorails [episode][]
 * Finally, you can choose to create a Github repository for you project and push it directly.
 
