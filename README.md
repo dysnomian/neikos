@@ -4,11 +4,12 @@
 
 - update this README
 - docker compose instead of foreman
+- use dart-sass
 - sass (+ bourbon?)
 - highvoltage
 - react https://github.com/adaam2/docker-rails-react-starter
 - typescript compilation https://dev.to/ohbarye/modern-rails-app-boilerplate-with-react--typescript--docker-compose-h47
-- rspec
+- rspec gem + install
 - update generated readme
 - figure out a deployment story
 - postmark for mailers
