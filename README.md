@@ -1,5 +1,7 @@
 # Neikos
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/ad652f7369a1fd14d505/maintainability)](https://codeclimate.com/github/dysnomian/neikos/maintainability)
+
 ## TODO
 
 - update this README
